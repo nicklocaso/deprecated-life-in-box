@@ -28,51 +28,80 @@ class Entity {
     return Entity.distance(this, other) < this.actionArea + other.size;
   }
 
-  update(others) {
-    let sons = [];
-    if (this.energy <= 0) return [];
+  // update(others) {
+  //   let sons = [];
+  //   if (this.energy <= 0) return [];
 
+  //   let xDirection = 0;
+  //   let yDirection = 0;
+  //   for (let other of others) {
+  //     if (other.energy <= 0) continue;
+
+  //     if (Entity.collide(this, other)) {
+  //       if (this.genoma.getSex() === other.genoma.getSex()) {
+  //         let den = this.x - other.x;
+  //         if (den != 0) {
+  //           let m = (this.y - other.y) / den;
+  //           xDirection = (Math.cos(m) * this.step) / this.size;
+  //           yDirection = (Math.sin(m) * this.step) / this.size;
+  //         } else {
+  //           xDirection = this.oldXDirection;
+  //           yDirection = this.oldYDirection;
+  //         }
+  //         if (this.x < other.x) xDirection *= -1;
+  //         if (this.y < other.y) yDirection *= -1;
+  //       } else {
+  //         sons = [
+  //           new Entity({
+  //             x: this.x + 30,
+  //             y: this.y + 30,
+  //             genoma: Genoma.mate(this.genoma, other.genoma)
+  //           })
+  //         ];
+  //       }
+  //     }
+  //   }
+  //   this.oldXDirection = xDirection;
+  //   this.oldYDirection = yDirection;
+  //   this.x += xDirection;
+  //   this.y += yDirection;
+
+  //   // Stats
+  //   this.energy -= Math.abs(xDirection);
+  //   this.energy -= Math.abs(yDirection);
+
+  //   if (this.energy > 255) this.energy = 255;
+
+  //   return sons;
+  // }
+
+  update(memory, index) {
     let xDirection = 0;
     let yDirection = 0;
-    for (let other of others) {
-      if (other.energy <= 0) continue;
 
+    for (let i = 0; i < memory.entities.length; i++) {
+      if (i === index) continue;
+      // Iteration with other
+      let other = memory.entities[i];
       if (Entity.collide(this, other)) {
-        if (this.genoma.getSex() === other.genoma.getSex()) {
-          let den = this.x - other.x;
-          if (den != 0) {
-            let m = (this.y - other.y) / den;
-            xDirection = (Math.cos(m) * this.step) / this.size;
-            yDirection = (Math.sin(m) * this.step) / this.size;
-          } else {
-            xDirection = this.oldXDirection;
-            yDirection = this.oldYDirection;
-          }
-          if (this.x < other.x) xDirection *= -1;
-          if (this.y < other.y) yDirection *= -1;
+        let den = this.x - other.x;
+        if (den != 0) {
+          let m = (this.y - other.y) / den;
+          xDirection = (Math.cos(m) * this.step) / this.size;
+          yDirection = (Math.sin(m) * this.step) / this.size;
         } else {
-          sons = [
-            new Entity({
-              x: this.x + 30,
-              y: this.y + 30,
-              genoma: Genoma.mate(this.genoma, other.genoma)
-            })
-          ];
+          xDirection = this.oldXDirection;
+          yDirection = this.oldYDirection;
         }
+        if (this.x < other.x) xDirection *= -1;
+        if (this.y < other.y) yDirection *= -1;
       }
     }
+
     this.oldXDirection = xDirection;
     this.oldYDirection = yDirection;
     this.x += xDirection;
     this.y += yDirection;
-
-    // Stats
-    this.energy -= Math.abs(xDirection);
-    this.energy -= Math.abs(yDirection);
-
-    if (this.energy > 255) this.energy = 255;
-
-    return sons;
   }
 
   draw() {
