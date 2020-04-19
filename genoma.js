@@ -54,6 +54,14 @@ class Genoma {
     let me = this.getValue();
     return parseInt(me.slice(11, 13).join(""), 2);
   }
+
+  getColors() {
+    let me = this.getValue();
+    let rr = parseInt(me.slice(8, 16).join(""), 2);
+    let bb = parseInt(me.slice(7, 15).join(""), 2);
+    let gg = parseInt(me.slice(6, 14).join(""), 2);
+    return { rr, bb, gg };
+  }
 }
 
 function getRandomInt(min, max) {
