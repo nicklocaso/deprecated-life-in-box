@@ -25,7 +25,7 @@ function draw() {
   let toAdd = [];
   for (let i = 0; i < entities.length; i++) {
     let actual = entities.splice(i, 1)[0];
-    toAdd = actual.update(entities);
+    toAdd = [...toAdd, ...actual.update(entities)];
     entities.splice(i, 0, actual);
   }
   if (toAdd && Array.isArray(toAdd)) entities = [...entities, ...toAdd];
