@@ -4,17 +4,20 @@ class Entity {
   constructor({ x, y, genoma }) {
     this.x = x;
     this.y = y;
-    this.xx = 0;
-    this.yy = 0;
-    this.genoma = genoma || new Genoma();
-    this.sex = this.genoma.getSex();
+    this.xx = getRandomInt(0, 15);
+    if (getRandomInt(0, 1)) this.xx *= -1;
+    this.yy = getRandomInt(0, 15);
+    if (getRandomInt(0, 1)) this.yy *= -1;
+    this.genoma = new Genoma(genoma);
+    // this.sex = this.genoma.getSex();
     // console.log(this.genoma.getLife());
-    this.end = Date.now() + this.genoma.getLife() * 1000;
-    this.size = 25;
-    this.colors = this.genoma.getColors();
-    this.energy = 100;
-    this.eggs = this.genoma.getEggs();
-    this.lastEgg = Date.now(); // + 10000;
+    // this.end = Date.now() + this.genoma.getLife() * 1000;
+    this.size = 50;
+    // this.colors = this.genoma.getColors();
+    // this.energy = 100;
+    // this.eggs = this.genoma.getEggs();
+    this.lastEgg = Date.now(); //+ 5000;
+    this.alive = 10;
   }
 
   static distance(a, b) {
@@ -29,14 +32,13 @@ class Entity {
     return Entity.distance(this, other) < this.actionArea + other.size;
   }
 
+  mutate() {
+    this.genoma.mutate();
+  }
+
   update(memory, index) {
     let xDirection = 0;
     let yDirection = 0;
-
-    if (Date.now() > this.end) {
-      this.energy = 0;
-    }
-    if (this.energy <= 0) return;
 
     for (let i = 0; i < memory.entities.length; i++) {
       if (i === index) continue;
@@ -44,7 +46,7 @@ class Entity {
       // Iteration with the other
       let other = memory.entities[i];
 
-      if (other.energy <= 0) continue;
+      if (other.alive <= 0) continue;
 
       if (Entity.collide(this, other)) {
         let den = this.x - other.x;
@@ -79,25 +81,41 @@ class Entity {
 
         // Mate
         if (Date.now() - this.lastEgg > 10000) {
-          // console.log("this", this.genoma._value[0].join());
-          // console.log("this", this.genoma._value[1].join());
-          // console.log("other", other.genoma._value[0].join());
-          // console.log("other", other.genoma._value[1].join());
-          if (this.sex != other.sex) {
-            // if (this.sex != other.sex) {
-            for (let j = 0; j < this.eggs; j++) {
-              memory.toAdd = [
-                ...memory.toAdd,
-                new Entity({
-                  x: this.x,
-                  y: this.y,
-                  genoma: Genoma.mate(this.genoma, other.genoma)
-                })
-              ];
-            }
+          let son = this.genoma.reproduce(other.genoma);
+          if (son instanceof Genoma) {
+            console.log("FATTO!");
+            memory.toAdd = [
+              ...memory.toAdd,
+              new Entity({
+                x: this.x,
+                y: this.y,
+                genoma: son
+              })
+            ];
             this.lastEgg = Date.now();
           }
         }
+
+        // if (Date.now() - this.lastEgg > 10000) {
+        //   // console.log("this", this.genoma._value[0].join());
+        //   // console.log("this", this.genoma._value[1].join());
+        //   // console.log("other", other.genoma._value[0].join());
+        //   // console.log("other", other.genoma._value[1].join());
+        //   if (this.sex != other.sex) {
+        //     // if (this.sex != other.sex) {
+        //     for (let j = 0; j < this.eggs; j++) {
+        //       memory.toAdd = [
+        //         ...memory.toAdd,
+        //         new Entity({
+        //           x: this.x,
+        //           y: this.y,
+        //           genoma: Genoma.mate(this.genoma, other.genoma)
+        //         })
+        //       ];
+        //     }
+        //     this.lastEgg = Date.now();
+        //   }
+        // }
       }
     }
 
@@ -123,6 +141,14 @@ class Entity {
       this.yy = Math.abs(this.yy) * -1;
     }
 
+    if (Math.abs(this.xx) < 0.1 && Math.abs(this.yy) < 0.1) {
+      this.alive--;
+      this.xx = getRandomInt(0, 15);
+      if (getRandomInt(0, 1)) this.xx *= -1;
+      this.yy = getRandomInt(0, 15);
+      if (getRandomInt(0, 1)) this.yy *= -1;
+    }
+
     this.xx = this.xx / 1.02;
     this.yy = this.yy / 1.02;
 
@@ -133,8 +159,8 @@ class Entity {
   }
 
   draw() {
-    // fill(this.energy > 255 ? 255 : this.energy, 255);
-    fill(color(this.colors.rr, this.colors.gg, this.colors.bb, 50));
+    let { r, g, b } = this.genoma.getColors();
+    fill(color(r, g, b, 50));
     circle(this.x, this.y, this.size / 3);
     circle(this.x, this.y, this.size);
   }
