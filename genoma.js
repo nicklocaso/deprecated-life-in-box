@@ -37,9 +37,17 @@ class Genoma {
   }
 
   getKey() {
-    // Compatibility: 15% of dna tail
-    let p = (Genoma.length * 1.5) / 10;
-    return this.getRuling().substr(Genoma.length - p);
+    let myX = this.DNA.x.substr(52);
+    let myY = this.DNA.y.substr(52);
+
+    if (parseInt(myX, 2) > parseInt(myY, 2)) {
+      return myX + myY;
+    } else {
+      return myY + myX;
+    }
+
+    // let p = (Genoma.length * 1.5) / 10;
+    // return this.getRuling().substr(Genoma.length - p);
   }
 
   mutate() {

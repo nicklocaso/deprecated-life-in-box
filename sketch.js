@@ -7,24 +7,25 @@ let entities = [];
 function setup() {
   createCanvas(width, height);
   frameRate(25);
-
-  for (let y = 0; y < 1; y++) {
-    let _genoma = new Genoma();
-    for (let i = 0; i < 10; i++) {
-      let e = new Entity({
-        x: Math.floor(Math.random() * width),
-        y: Math.floor(Math.random() * height),
-        genoma: _genoma
-      });
-      e.mutate();
-      entities = [...entities, e];
-    }
-  }
 }
 function draw() {
   background(150);
 
-  // for (let e of entities) e.draw();
+  if (entities.length == 0 || entities.length > 350) {
+    entities = [];
+    for (let y = 0; y < 1; y++) {
+      let _genoma = new Genoma();
+      for (let i = 0; i < 20; i++) {
+        let e = new Entity({
+          x: Math.floor(Math.random() * width),
+          y: Math.floor(Math.random() * height),
+          genoma: _genoma
+        });
+        e.mutate();
+        entities = [...entities, e];
+      }
+    }
+  }
 
   let species = {};
   let females = 0;

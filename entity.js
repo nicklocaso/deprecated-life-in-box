@@ -17,7 +17,7 @@ class Entity {
     // this.energy = 100;
     // this.eggs = this.genoma.getEggs();
     this.lastEgg = Date.now(); //+ 5000;
-    this.alive = 10;
+    this.alive = 5;
   }
 
   static distance(a, b) {
@@ -161,7 +161,7 @@ class Entity {
   draw() {
     let { r, g, b } = this.genoma.getColors();
     fill(color(r, g, b, 50));
-    circle(this.x, this.y, this.size / 3);
+    // circle(this.x, this.y, this.size / 3);
     circle(this.x, this.y, this.size);
   }
 }
