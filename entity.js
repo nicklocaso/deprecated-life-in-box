@@ -7,16 +7,14 @@ class Entity {
     this.xx = 0;
     this.yy = 0;
     this.genoma = genoma || new Genoma();
-    this.size = 10 * this.genoma.getSize();
+    this.sex = this.genoma.getSex();
+    // console.log(this.genoma.getLife());
+    this.end = Date.now() + this.genoma.getLife() * 1000;
+    this.size = 25;
     this.colors = this.genoma.getColors();
-
     this.energy = 100;
-    // this.eggs = 10;
-    // this.step = 10;
-    // this.oldXDirection = 0;
-    // this.oldYDirection = 0;
-
-    this.lastEgg = Date.now() + 50000;
+    this.eggs = this.genoma.getEggs();
+    this.lastEgg = Date.now(); // + 10000;
   }
 
   static distance(a, b) {
@@ -31,64 +29,23 @@ class Entity {
     return Entity.distance(this, other) < this.actionArea + other.size;
   }
 
-  // update(others) {
-  //   let sons = [];
-  //   if (this.energy <= 0) return [];
-
-  //   let xDirection = 0;
-  //   let yDirection = 0;
-  //   for (let other of others) {
-  //     if (other.energy <= 0) continue;
-
-  //     if (Entity.collide(this, other)) {
-  //       if (this.genoma.getSex() === other.genoma.getSex()) {
-  //         let den = this.x - other.x;
-  //         if (den != 0) {
-  //           let m = (this.y - other.y) / den;
-  //           xDirection = (Math.cos(m) * this.step) / this.size;
-  //           yDirection = (Math.sin(m) * this.step) / this.size;
-  //         } else {
-  //           xDirection = this.oldXDirection;
-  //           yDirection = this.oldYDirection;
-  //         }
-  //         if (this.x < other.x) xDirection *= -1;
-  //         if (this.y < other.y) yDirection *= -1;
-  //       } else {
-  //         sons = [
-  //           new Entity({
-  //             x: this.x + 30,
-  //             y: this.y + 30,
-  //             genoma: Genoma.mate(this.genoma, other.genoma)
-  //           })
-  //         ];
-  //       }
-  //     }
-  //   }
-  //   this.oldXDirection = xDirection;
-  //   this.oldYDirection = yDirection;
-  //   this.x += xDirection;
-  //   this.y += yDirection;
-
-  //   // Stats
-  //   this.energy -= Math.abs(xDirection);
-  //   this.energy -= Math.abs(yDirection);
-
-  //   if (this.energy > 255) this.energy = 255;
-
-  //   return sons;
-  // }
-
   update(memory, index) {
     let xDirection = 0;
     let yDirection = 0;
 
+    if (Date.now() > this.end) {
+      this.energy = 0;
+    }
     if (this.energy <= 0) return;
 
     for (let i = 0; i < memory.entities.length; i++) {
       if (i === index) continue;
+
       // Iteration with the other
       let other = memory.entities[i];
+
       if (other.energy <= 0) continue;
+
       if (Entity.collide(this, other)) {
         let den = this.x - other.x;
         if (den != 0) {
@@ -106,7 +63,7 @@ class Entity {
           if (this.y > other.y && yDirection > 0) yDirection *= -1;
 
           if (distance < this.size / 2) {
-            this.energy++;
+            // this.size++;
           }
         } else {
           // Go Away
@@ -116,21 +73,28 @@ class Entity {
           if (this.y > other.y && yDirection < 0) yDirection *= -1;
 
           if (distance < other.size / 2) {
-            this.energy--;
+            // this.size--;
           }
         }
 
         // Mate
         if (Date.now() - this.lastEgg > 10000) {
-          if (this.genoma.getSex() !== other.genoma.getSex()) {
-            memory.toAdd = [
-              ...memory.toAdd,
-              new Entity({
-                x: this.x,
-                y: this.y,
-                genoma: Genoma.mate(this.genoma, other.genoma)
-              })
-            ];
+          // console.log("this", this.genoma._value[0].join());
+          // console.log("this", this.genoma._value[1].join());
+          // console.log("other", other.genoma._value[0].join());
+          // console.log("other", other.genoma._value[1].join());
+          if (this.sex != other.sex) {
+            // if (this.sex != other.sex) {
+            for (let j = 0; j < this.eggs; j++) {
+              memory.toAdd = [
+                ...memory.toAdd,
+                new Entity({
+                  x: this.x,
+                  y: this.y,
+                  genoma: Genoma.mate(this.genoma, other.genoma)
+                })
+              ];
+            }
             this.lastEgg = Date.now();
           }
         }
@@ -140,23 +104,27 @@ class Entity {
     // With World Walls
     if (this.x < 0) {
       this.x = 0;
-      xDirection *= -1;
+      xDirection = Math.abs(xDirection);
+      this.xx = Math.abs(this.xx);
     }
     if (this.x > memory.options.width) {
       this.x = memory.options.width;
-      xDirection *= -1;
+      xDirection = Math.abs(xDirection) * -1;
+      this.xx = Math.abs(this.xx) * -1;
     }
     if (this.y < 0) {
       this.y = 0;
-      yDirection *= -1;
+      yDirection = Math.abs(yDirection);
+      this.yy = Math.abs(this.yy);
     }
     if (this.y > memory.options.height) {
       this.y = memory.options.height;
-      yDirection *= -1;
+      yDirection = Math.abs(yDirection) * -1;
+      this.yy = Math.abs(this.yy) * -1;
     }
 
-    this.xx = this.xx / 1.05;
-    this.yy = this.yy / 1.05;
+    this.xx = this.xx / 1.02;
+    this.yy = this.yy / 1.02;
 
     this.xx += xDirection;
     this.yy += yDirection;
@@ -165,9 +133,9 @@ class Entity {
   }
 
   draw() {
-    fill(this.energy > 255 ? 255 : this.energy, 255);
-    circle(this.x, this.y, this.size / 3);
+    // fill(this.energy > 255 ? 255 : this.energy, 255);
     fill(color(this.colors.rr, this.colors.gg, this.colors.bb, 50));
+    circle(this.x, this.y, this.size / 3);
     circle(this.x, this.y, this.size);
   }
 }

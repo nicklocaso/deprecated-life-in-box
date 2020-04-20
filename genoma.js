@@ -1,6 +1,6 @@
 "use strict";
 
-const genLen = 16;
+const genLen = 56;
 
 class Genoma {
   constructor(value) {
@@ -14,6 +14,8 @@ class Genoma {
     }
     return result;
   }
+
+  static compatible(a, b) {}
 
   static mate(a, b) {
     if (a.getSex() !== b.getSex()) {
@@ -35,6 +37,10 @@ class Genoma {
     }
   }
 
+  changeSex() {
+    this._value[0][0] = this.getSex() == 0 ? 1 : 0;
+  }
+
   getValue() {
     // The first bit decide sex
     return this._value[this.getSex()];
@@ -50,16 +56,21 @@ class Genoma {
     return parseInt(me.slice(6, 10).join(""), 2);
   }
 
-  getRegeneration() {
-    let me = this.getValue();
-    return parseInt(me.slice(11, 13).join(""), 2);
+  getEggs() {
+    let me = this.getValue(); // 3 dig
+    return parseInt(me.slice(11, 14).join(""), 2);
+  }
+
+  getLife() {
+    let me = this.getValue(); // 4 dig
+    return parseInt(me.slice(21, 25).join(""), 2);
   }
 
   getColors() {
-    let me = this.getValue();
-    let rr = parseInt(me.slice(8, 16).join(""), 2);
-    let bb = parseInt(me.slice(7, 15).join(""), 2);
-    let gg = parseInt(me.slice(6, 14).join(""), 2);
+    let me = this.getValue(); // 4 dig
+    let rr = 17 * parseInt(me.slice(30, 34).join(""), 2);
+    let bb = 17 * parseInt(me.slice(34, 38).join(""), 2);
+    let gg = 17 * parseInt(me.slice(38, 42).join(""), 2);
     return { rr, bb, gg };
   }
 }
@@ -69,3 +80,10 @@ function getRandomInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min; //Il max è incluso e il min è incluso
 }
+
+let g = new Genoma();
+
+// console.log(g._value[0].join(""));
+// console.log(g._value[1].join(""));
+
+// console.log(g.getColors());

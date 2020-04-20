@@ -1,22 +1,26 @@
 "use strict";
 
-let width = 900;
-let height = 700;
+let width = 400; //900;
+let height = 200; // 700;
 let entities = [];
 
 function setup() {
   createCanvas(width, height);
   frameRate(20);
 
+  let g = new Genoma();
+
   for (let i = 0; i < 150; i++) {
-    entities = [
-      ...entities,
-      new Entity({
-        x: Math.floor(Math.random() * width),
-        y: Math.floor(Math.random() * height),
-        size: Math.floor(Math.random() * (70 - 5 + 1)) + 5
-      })
-    ];
+    let genoma = g;
+    if (getRandomInt(0, 1)) genoma.changeSex();
+
+    let e = new Entity({
+      x: Math.floor(Math.random() * width),
+      y: Math.floor(Math.random() * height),
+      genoma
+    });
+    e.size = 25;
+    entities = [...entities, e];
   }
 }
 function draw() {
