@@ -110,7 +110,7 @@ class Genoma {
             active[i] = passive[i];
           }
           let son = new Genoma({ DNA: active });
-          son.mutate(2);
+          son.mutate(3);
           return son;
         }
       }

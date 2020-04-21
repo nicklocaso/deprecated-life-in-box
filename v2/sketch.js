@@ -11,15 +11,21 @@ function setup() {
 
   // Initialization
 
-  let genoma = new Genoma();
+  let parentA;
+  let parentB;
+
+  parentA = new Entity();
+  parentA.genoma.DNA[0] = 0;
+  parentB = new Entity({ genoma: parentA.genoma });
+  parentB.genoma.DNA[0] = 1;
+
   for (let i = 0; i < 150; i++) {
-    genoma.mutate(5);
     entities = [
       ...entities,
       new Entity({
         x: getRandomInt(0, WIDTH),
         y: getRandomInt(0, HEIGHT),
-        genoma
+        genoma: parentA.genoma.reproduce(parentB.genoma)
       })
     ];
   }
@@ -27,7 +33,7 @@ function setup() {
 
 function draw() {
   // Draw background
-  background(150);
+  background(200);
   // Draw entities
   for (let e of entities) {
     e.draw();
@@ -39,7 +45,7 @@ function draw() {
 function update() {
   let toAdd = [];
   for (let i = 0; i < entities.length; i++) {
-    if (entities.toRemove) {
+    if (entities[i].toRemove) {
       entities.splice(i, 1);
       continue;
     }
